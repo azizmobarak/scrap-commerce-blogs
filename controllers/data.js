@@ -1,5 +1,5 @@
 const puppeteer = require('puppeteer');
-const data = require('../models/insertdata');
+const data = require('../models/data');
 
 const Scrapfunction = (req, res) => {
     console.log('start')
@@ -9,7 +9,7 @@ const Scrapfunction = (req, res) => {
 
             //creating browser and page
             const browser = await puppeteer.launch({
-                headless: false,
+                headless: true,
                 //args: ['--proxy-server=161.129.155.43:3128']
                 timeout: 50000
             });
@@ -23,7 +23,7 @@ const Scrapfunction = (req, res) => {
             // for javascript block : req.resourceType() === 'script' => not used here
             await page.setRequestInterception(true);
             page.on('request', (req) => {
-                if (req.resourceType() === 'image' || req.resourceType() === 'stylesheet' || req.resourceType() === 'font') {
+                if (req.resourceType() === 'script' || req.resourceType() === 'image' || req.resourceType() === 'stylesheet' || req.resourceType() === 'font') {
                     req.abort();
                 } else {
                     req.continue();
@@ -36,25 +36,36 @@ const Scrapfunction = (req, res) => {
 
             const result = await page.evaluate(() => {
                 var tab = [];
-                for (var i = 0; i < 50; i++) {
-                    try {
+
+                try {
+                    for (var i = 0; i < 50; i++) {
                         tab.push({
-                            image: document.querySelectorAll('img')[i].srcset,
+                            image: document.querySelectorAll('article>a>span>span>noscript')[i].textContent.slice(27, document.querySelectorAll('article>a>span>span>noscript')[i].textContent.indexOf(";width")),
                             title: document.querySelectorAll('h2>a')[i].textContent,
                             url: document.querySelectorAll('h2>a')[i].href,
                             name: "shoppify"
                         });
-                    } catch (e) {
-                        console.log(i + "/" + e);
                     }
-
+                } catch (e) {
+                    console.log(e);
                 }
+
+
                 return tab;
             });
 
-            /*await browser.close();
+            await browser.close();
 
-            var articledata = new data({ data: result });
+            /*
+            //delete existence data
+            var articledata = new data();
+            articledata.deleteOne((err, doc) => {
+                if (err) console.log(err);
+                console.log(doc);
+            })
+
+            //add new data
+            articledata = new data({ data: result });
             articledata.save((err, doc) => {
                 if (err) console.log(err);
                 console.log(doc)

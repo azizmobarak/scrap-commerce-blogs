@@ -6,6 +6,8 @@ const router = require('./routes');
 const bodyparser = require('body-parser');
 const mongoose = require('mongoose');
 
+app.use(bodyparser.json());
+
 app.use('/', router);
 
 mongoose.connect(process.env.CONNECTION, { useNewUrlParser: true }, (err) => {

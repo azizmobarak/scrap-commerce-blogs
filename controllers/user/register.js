@@ -7,17 +7,17 @@ const Register = (req, res) => {
         if (req.body !== null || req.body !== "undefined" || req.body !== {}) {
             const newuser = new User(req.body);
             newuser.save((err, doc) => {
-                if (err) res.json({ success: "no" });
+                if (err) res.status(403).json({ success: "no" });
                 console.log("added : " + doc);
             });
             res.status(200).json({ success: "ok" });
 
         } else {
-            res.send({ success: "The content should not be empty!" });
+            res.status(403).json({ success: "The content should not be empty!" });
         }
 
     } catch (e) {
-        res.json({ success: "something happens try later!" })
+        res.status(403).json({ success: "something happens try later!" })
     }
 }
 

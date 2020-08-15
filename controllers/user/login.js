@@ -21,17 +21,20 @@ const verify = (req, res, next) => {
 const Login = (req, res) => {
     User.find({ email: req.body.email }, 'password', (err, doc) => {
         if (err) console.log(err);
-        if (doc.length !== 0) {
-            if (req.body.password === doc[0].password) {
-                jwt.sign(req.body.email, "login", (err, token) => {
-                    if (err) console.log(err);
-                    res.status(200).json({ success: "ok", token: token });
-                });
+        else {
+            if (doc.length !== 0) {
+                if (req.body.password === doc[0].password) {
+                    jwt.sign(req.body.email, "userlogintoblog", (err, token) => {
+                        if (err) console.log(err);
+                        res.cookie('token', token, { httpOnly: true });
+                        res.status(200).json({ success: "ok", token: token });
+                    });
+                } else {
+                    res.status(403).json({ success: "no", message: "Email or password not correct" })
+                }
             } else {
                 res.status(403).json({ success: "no", message: "Email or password not correct" })
             }
-        } else {
-            res.status(403).json({ success: "no", message: "Email or password not correct" })
         }
     });
 }

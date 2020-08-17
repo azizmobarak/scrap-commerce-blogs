@@ -6,14 +6,17 @@ const Port = process.env.PORT || 2000
 const router = require('./routes');
 const bodyparser = require('body-parser');
 const mongoose = require('mongoose');
-//const cookieparser = require('cookie-parser');
+const cookieparser = require('cookie-parser');
 
-app.use(cors());
+app.use(cors({
+    origin: "http://localhost:8081",
+    credentials: true
+}));
 
 app.use(express.json());
 app.use(bodyparser.json());
 app.use(bodyparser.urlencoded({ extended: true }));
-//app.use(cookieparser());
+app.use(cookieparser());
 app.use('/', router);
 
 mongoose.connect(process.env.CONNECTION, { useNewUrlParser: true }, (err) => {

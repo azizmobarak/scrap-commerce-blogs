@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken');
 const verify = (req, res, next) => {
     console.log("called")
     const schema = Joi.object({
-        email: Joi.string().required().max(60).min(6),
+        email: Joi.string().required().max(60).min(6).regex(/^[A-Za-z\d]+([-_.][A-Za-z\d]+)*@([A-Za-z\d]+[-.])+[A-Za-z\d]{2,4}$/, "example@example.example"),
         password: Joi.string().required().max(100).min(4)
     });
     if (typeof(schema.validate(req.body).error) !== "undefined") {
